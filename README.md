@@ -25,7 +25,7 @@ The system handles local backup creation (using `rsync` or `tar` for archiving, 
 
 ## Project Structure
 ````
-BackupVault_Project/
+BackupVault/
 ├── backupvault.sh              # Main Bash script for local operations
 ├── backup_config_ui.py         # Python Tkinter GUI for configuration
 │
