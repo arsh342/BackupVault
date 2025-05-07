@@ -1,1 +1,224 @@
-# BackupVault
+# BackupVault: Store and restore effortlessly
+
+## Overview
+
+BackupVault is an automated backup system designed for Linux users. It provides a local graphical user interface (GUI) built with Python's Tkinter for easy configuration of backup jobs, and a web-based dashboard for monitoring backup status, history, and storage usage.
+
+The system handles local backup creation (using `rsync` or `tar` for archiving, `gzip` for compression), optional GPG encryption, scheduling via `cron`, and can also upload backups to cloud storage using `rclone`. Email notifications can be configured to report backup status.
+
+## Features
+
+* **Graphical Configuration:** Easy-to-use local GUI (Tkinter) for setting up backup parameters.
+* **Automated Backups:** Schedule backups daily, weekly, monthly, or with a custom cron schedule.
+* **Flexible Backup Methods:**
+    * Direct synchronization using `rsync`.
+    * Archiving (`.tar.gz`, `.zip`).
+* **Security:** Optional GPG encryption for backup archives.
+* **Cloud Integration:** Supports uploading backups to various cloud storage providers via `rclone` (user must pre-configure rclone remotes).
+* **Email Notifications:** Get notified about the status of your backup runs.
+* **Web Monitoring Dashboard:** A Flask-based web GUI to view:
+    * Backup History (date, size, status)
+    * Detailed Logs Viewer
+    * Next Scheduled Backup
+    * Storage Usage Chart for the destination volume.
+* **Structured Logging:** Maintains both summary (CSV) and detailed logs for auditing and troubleshooting.
+
+## Project Structure
+BackupVault_Project/
+├── backupvault.sh              # Main Bash script for local operations
+├── backup_config_ui.py         # Python Tkinter GUI for configuration
+│
+└── backupvault_web/            # Flask web application for dashboard
+├── app.py                  # Flask backend application logic
+├── data_parser.py          # Python module for parsing config and logs
+├── static/
+│   ├── css/
+│   │   └── style.css       # CSS for the dashboard
+│   └── js/
+│       ├── main.js         # JavaScript for dashboard interactivity
+│       └── (Chart.min.js)  # Chart.js library (typically loaded via CDN in HTML)
+├── templates/
+│   └── dashboard.html      # HTML template for the dashboard
+└── instance/               # (May be created by Flask for instance-specific data)
+
+## File Descriptions
+
+### Root Directory (`BackupVault_Project/`)
+
+* **`backupvault.sh`**
+    * **Purpose:** The core script for all local backup operations. It handles configuration requests, executes backups, manages scheduling, and logs activities.
+    * **Working:**
+        * Parses command-line arguments (`config`, `run`, `schedule`, `--help`).
+        * When `config` is used, it launches `backup_config_ui.py`.
+        * Loads settings from `~/.backupvault/backupvault.conf`.
+        * The `run` command triggers `perform_backup()`:
+            * Creates a detailed log for the current run in `~/.backupvault/logs/details/`.
+            * Performs backup using `rsync` or `tar`+`gzip`/`zip` based on configuration.
+            * Optionally encrypts the archive using `gpg`.
+            * Optionally uploads the backup to cloud storage using `rclone`.
+            * Appends a summary of the run to `~/.backupvault/logs/backup_runs.csv`.
+            * Optionally sends an email notification using the `mail` command.
+        * The `schedule` command updates the user's crontab to automate `backupvault.sh run`.
+
+* **`backup_config_ui.py`**
+    * **Purpose:** Provides a graphical user interface (GUI) built with Python's Tkinter for users to easily define and modify their backup settings.
+    * **Working:**
+        * Launched by `backupvault.sh config`.
+        * Reads existing settings from `~/.backupvault/backupvault.conf` to pre-populate the GUI fields. If the file doesn't exist, it uses default values.
+        * Presents various input fields, dropdowns, and checkboxes for all configurable options (source/destination paths, frequency, compression, encryption, email, cloud settings).
+        * Includes "Browse" dialogs for selecting directories.
+        * Validates critical inputs before saving.
+        * When "Save Configuration" is clicked, it writes the settings in `KEY="VALUE"` format to `~/.backupvault/backupvault.conf`.
+
+### Web Dashboard (`BackupVault_Project/backupvault_web/`)
+
+* **`app.py`**
+    * **Purpose:** The main Flask web application server.
+    * **Working:**
+        * Defines URL routes for the web dashboard (e.g., `/` for the main page) and API endpoints (e.g., `/api/backup_summary`, `/api/backup_history`).
+        * Uses functions from `data_parser.py` to fetch backup configuration, history, and statistics.
+        * Serves the `dashboard.html` template.
+        * Responds to API requests from `main.js` with JSON data.
+
+* **`data_parser.py`**
+    * **Purpose:** A Python module responsible for reading and parsing the data files generated by `backupvault.sh`.
+    * **Working:**
+        * Reads `~/.backupvault/backupvault.conf` to get current backup job settings.
+        * Reads `~/.backupvault/logs/backup_runs.csv` to get the history of backup runs.
+        * Provides functions to retrieve specific detailed log files from `~/.backupvault/logs/details/`.
+        * Includes logic to calculate derived information like the next scheduled run time (estimation) and storage usage on the destination volume (using `shutil.disk_usage`).
+
+* **`templates/dashboard.html`**
+    * **Purpose:** The HTML file that defines the structure and layout of the web monitoring dashboard.
+    * **Working:**
+        * Contains HTML elements for displaying summary statistics, charts, backup history tables, and the log viewer modal.
+        * Uses placeholders (elements with specific `id`s) that are dynamically populated with data by `main.js`.
+        * Links to `style.css` for styling and `main.js` for interactivity.
+        * Loads the Chart.js library (typically via a CDN link specified in the HTML `<head>`).
+
+* **`static/css/style.css`**
+    * **Purpose:** Contains all the CSS rules to style the `dashboard.html` page.
+    * **Working:**
+        * Defines the visual appearance, including the dark theme, layout (using Flexbox/Grid), typography (using Google Fonts "Inter" and "JetBrains Mono"), colors, spacing, and responsive design for different screen sizes.
+        * Includes styles for glassmorphism effects and custom scrollbars.
+
+* **`static/js/main.js`**
+    * **Purpose:** Provides client-side interactivity for the web dashboard.
+    * **Working:**
+        * Runs after the `dashboard.html` page is loaded.
+        * Makes asynchronous (AJAX) calls to the API endpoints defined in `app.py` (e.g., `/api/backup_history`) to fetch data.
+        * Dynamically updates the content of HTML elements (e.g., populates tables, updates statistics) based on the fetched data.
+        * Uses the Chart.js library to render the storage usage chart.
+        * Manages the behavior of the log viewer modal.
+
+### Data Files (Typically in `~/.backupvault/`)
+
+These files are generated and used by the BackupVault system during its operation:
+
+* **`~/.backupvault/backupvault.conf`**
+    * **Purpose:** Stores the user's backup job configuration.
+    * **Format:** Plain text, `KEY="VALUE"` pairs.
+    * **Managed by:** Written by `backup_config_ui.py` (Tkinter GUI). Read by `backupvault.sh` (for performing backups and scheduling) and `data_parser.py` (for the web dashboard).
+
+* **`~/.backupvault/logs/backup_runs.csv`**
+    * **Purpose:** A summary log of all backup attempts.
+    * **Format:** CSV (Comma Separated Values) with a header row. Each row details a single backup run (ID, job name, start/end times, status, size, paths, log file link, summary).
+    * **Managed by:** Appended to by `backupvault.sh` after each backup run. Read by `data_parser.py`.
+
+* **`~/.backupvault/logs/details/run_YYYYMMDD_HHMMSS.log`**
+    * **Purpose:** Detailed, verbose log for a specific backup run.
+    * **Format:** Plain text. Contains the output from `rsync`, `tar`, `gpg`, `rclone`, and other script messages.
+    * **Managed by:** Created by `backupvault.sh` for each run. Referenced in `backup_runs.csv` and read by `data_parser.py` (via `app.py`) when a user requests to view details.
+
+* **`~/.backupvault/logs/backupvault_script_operations.log`** (Optional general log)
+    * **Purpose:** General operational log for `backupvault.sh` itself, especially for actions outside a specific backup run (e.g., script invocation, wizard start).
+    * **Managed by:** `backupvault.sh`.
+
+## Prerequisites & Dependencies
+
+**For Local Backup Script (`backupvault.sh` & `backup_config_ui.py`):**
+
+* **Bash:** The shell to run `backupvault.sh`.
+* **Python 3:** To run `backup_config_ui.py`.
+* **Tkinter:** Python's standard GUI library (often installed as `python3-tk` on Debian/Ubuntu systems, e.g., `sudo apt install python3-tk`).
+* **Core Linux Utilities:** `rsync`, `tar`, `gzip`, `gpg` (for encryption), `mail` (from `mailutils` for email), `rclone` (for cloud backup), `cron` (for scheduling), `realpath`, `mktemp`, `stat`, `du`, `numfmt`, `sed`, `grep`, etc. (most are standard).
+    * Install any missing tools using your system's package manager (e.g., `sudo apt install rsync tar gzip gnupg mailutils rclone cron coreutils util-linux`).
+* **(Optional but recommended for some features):** A configured Mail Transfer Agent (MTA) like Postfix or SSMTP for reliable email sending. Pre-configured `rclone` remotes (`rclone config`).
+
+**For Web Dashboard (`backupvault_web/`):**
+
+* **Python 3:** To run the Flask application.
+* **Flask:** Python web framework (`pip install Flask`).
+* **Web Browser:** To view the dashboard.
+* **Chart.js:** JavaScript charting library (loaded via CDN in `dashboard.html`, so no local installation needed for it).
+
+## Setup and Installation
+
+1.  **Clone or Download:** Get the `BackupVault` directory onto your Linux machine.
+2.  **Install Dependencies:** Ensure all prerequisite software listed above is installed.
+3.  **Make `backupvault.sh` Executable:**
+    ```bash
+    cd path/to/BackupVault/
+    chmod +x backupvault.sh
+    ```
+4.  **(Web Dashboard)** Set up a Python virtual environment (recommended) for the web app:
+    ```bash
+    cd path/to/BackupVault/backupvault_web/
+    python3 -m venv venv
+    source venv/bin/activate  # On Linux/macOS
+    pip install Flask
+    # Deactivate with 'deactivate' when done
+    ```
+5.  **(Cloud Backup - if used)** Configure `rclone` for your desired cloud provider(s):
+    ```bash
+    rclone config
+    ```
+    Note the "remote name" you create for each cloud service.
+
+## How to Run
+
+1.  **Configure Your Backup Job:**
+    * Open a terminal in the `BackupVault/` directory.
+    * Run: `./backupvault.sh config`
+    * This will launch the Python Tkinter GUI. Fill in all your backup preferences (source folders, destination, frequency, compression, encryption, email, cloud settings) and click "Save Configuration". This creates/updates `~/.backupvault/backupvault.conf`.
+
+2.  **Perform a Manual Backup (Recommended after initial config):**
+    * Run: `./backupvault.sh run`
+    * This executes the backup immediately based on your saved settings. Check the output and the logs in `~/.backupvault/logs/`.
+
+3.  **Schedule Automatic Backups:**
+    * After saving your configuration, the GUI will prompt if you want to schedule.
+    * Alternatively, run: `./backupvault.sh schedule`
+    * This will add/update a `cron` job to run the backup automatically based on the configured frequency.
+
+4.  **Launch the Web Monitoring Dashboard:**
+    * Open a new terminal.
+    * Navigate to the web app directory: `cd path/to/BackupVault/backupvault_web/`
+    * If using a virtual environment, activate it: `source venv/bin/activate`
+    * Run the Flask app: `python3 app.py`
+    * Open your web browser and go to `http://localhost:5001` (or the URL shown in the Flask app's console output).
+
+## Troubleshooting (Brief)
+
+* **Backup Failures (`backupvault.sh run`):** Always check the detailed log file in `~/.backupvault/logs/details/run_YYYYMMDD_HHMMSS.log` for specific error messages from `rsync`, `tar`, `gpg`, or `rclone`.
+* **Web Dashboard Empty/Errors:**
+    * Ensure `backupvault.sh config` and `backupvault.sh run` have been successfully executed to generate data.
+    * Check the Flask app's console output (where you ran `python3 app.py`) for Python errors or warnings from `data_parser.py`.
+    * Use your web browser's Developer Tools (F12) - check the "Console" for JavaScript errors and the "Network" tab for failed API calls.
+* **Automatic (Cron) Backups Not Running:**
+    * Check cron logs (e.g., `/var/log/syslog` or `/var/log/cron`).
+    * Redirect the cron job's output to a file for debugging (edit via `crontab -e`).
+    * Ensure `PATH` is set correctly in `backupvault.sh` or use absolute paths for all commands.
+* **Email Not Received:** Check system mail logs (`/var/log/mail.log`) and local mail queue (`mailq`). Ensure your system is configured to send external emails.
+
+## Future Enhancements (Ideas)
+
+* More granular control over `rclone` options via GUI.
+* Direct integration (OAuth) for major cloud providers instead of relying solely on pre-configured rclone remotes.
+* Full implementation of backup retention policy (automatic deletion of old backups).
+* Restore functionality (browse and select files/folders to restore).
+* Dashboard option to trigger a manual backup run.
+
+---
+
+This README should provide a good starting point for anyone looking to understand and use your BackupVault project!
