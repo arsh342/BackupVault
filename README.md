@@ -24,7 +24,7 @@ The system handles local backup creation (using `rsync` or `tar` for archiving, 
 * **Structured Logging:** Maintains both summary (CSV) and detailed logs for auditing and troubleshooting.
 
 ## Project Structure
-
+````
 BackupVault_Project/
 ├── backupvault.sh              # Main Bash script for local operations
 ├── backup_config_ui.py         # Python Tkinter GUI for configuration
@@ -41,7 +41,7 @@ BackupVault_Project/
     ├── templates/
     │   └── dashboard.html      # HTML template for the dashboard
     └── instance/               # (May be created by Flask for instance-specific data)
-    
+````    
 
 ## File Descriptions
 
