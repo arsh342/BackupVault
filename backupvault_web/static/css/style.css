@@ -1,0 +1,353 @@
+/* backupvault_web/static/css/style.css */
+
+/* --- Base and Dark Theme --- */
+:root {
+    --bg-color: #0f172a; /* Deep dark blue - good base */
+    --surface-color: #1e293b; /* Slightly lighter, opaque surface (slate/dark blue) */
+    --surface-overlay-color: rgba(30, 41, 59, 0.9); /* For modals, slight transparency */
+    --border-color: #334155; /* Subtler border color (slate) */
+    --text-color: #cbd5e1; /* Lighter grey/off-white text for readability */
+    --text-muted-color: #94a3b8; /* Muted text (slate) */
+    --accent-color-1: #38bdf8; /* Sky blue - primary accent */
+    --accent-color-2: #f472b6; /* Pink - secondary accent, use sparingly */
+    --accent-color-3: #4ade80; /* Green - for success, can also be tertiary */
+    --link-color: var(--accent-color-1);
+    --success-color: var(--accent-color-3);
+    --error-color: #f43f5e; /* Rose/Red for errors */
+    --warning-color: #facc15; /* Yellow for warnings */
+    --shadow-soft: rgba(0, 0, 0, 0.1); /* Softer shadow for depth */
+    --shadow-medium: rgba(0, 0, 0, 0.2);
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-family-mono: 'JetBrains Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+    --border-radius-medium: 12px;
+    --border-radius-large: 16px;
+}
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    background-color: var(--bg-color);
+    /* Simplified background - subtle gradient or solid color */
+    background-image: linear-gradient(180deg, var(--bg-color) 0%, #0d1321 100%);
+    background-attachment: fixed;
+    color: var(--text-color);
+    line-height: 1.65; /* Improved line height */
+    font-size: 15px; /* Base font size */
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased; /* Smoother fonts on WebKit */
+    -moz-osx-font-smoothing: grayscale;  /* Smoother fonts on Firefox */
+}
+
+/* --- Header --- */
+header {
+    background: var(--surface-color); /* Opaque surface */
+    /* backdrop-filter: blur(10px); Optional: Keep a very subtle blur if desired, or remove */
+    /* -webkit-backdrop-filter: blur(10px); */
+    border-bottom: 1px solid var(--border-color);
+    color: #f8fafc;
+    padding: 1.25rem 2rem; /* Adjusted padding */
+    text-align: center;
+    position: sticky; 
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px var(--shadow-soft); /* Softer shadow */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2rem; /* Slightly adjusted */
+    font-weight: 700;
+    color: #ffffff; /* Solid white for clarity */
+    /* text-shadow: none; Removed glow */
+    /* background: linear-gradient... Removed gradient text for simplicity */
+    display: inline-block;
+}
+
+header p {
+    margin: 0.4rem 0 0;
+    font-weight: 400;
+    color: var(--text-muted-color);
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+}
+
+/* --- Main Content --- */
+main {
+    padding: 1.5rem; /* Standardized padding */
+    max-width: 1400px; /* Max content width */
+    margin: 1.5rem auto;
+}
+
+section {
+    background: var(--surface-color); /* Opaque surface */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 5px 15px var(--shadow-soft);
+    padding: 2rem; /* Consistent padding */
+    margin-bottom: 2rem;
+    transition: box-shadow 0.3s ease; /* Keep subtle hover */
+}
+
+section:hover {
+    box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+h2 {
+    color: var(--text-color); /* Brighter, clean heading color */
+    border-bottom: 1px solid var(--border-color); /* Subtler border */
+    padding-bottom: 0.8rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.6rem; /* Adjusted for hierarchy */
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem; /* Spacing for pseudo-element */
+}
+
+/* Simplified h2 pseudo-element or remove if too decorative */
+h2::before {
+    content: '';
+    display: inline-block;
+    width: 5px; /* Thicker, more like a bar */
+    height: 1.4rem; /* Match text height better */
+    background-color: var(--accent-color-1); /* Solid accent color */
+    border-radius: 3px;
+}
+
+/* --- Stat Cards --- */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* Responsive cards */
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: var(--surface-color); /* Opaque surface */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-medium);
+    box-shadow: 0 4px 12px var(--shadow-soft);
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden; /* If using pseudo-elements for borders */
+}
+
+/* Removed .stat-card::before (top gradient border) for simplicity */
+
+.stat-card:hover {
+    transform: translateY(-4px); /* Subtle lift */
+    box-shadow: 0 8px 20px var(--shadow-medium);
+}
+
+.stat-card h2 {
+    font-size: 0.9rem; /* Clearer title */
+    color: var(--text-muted-color);
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: none;
+    justify-content: center;
+}
+
+.stat-card h2::before { /* Remove ::before for card titles */
+    display: none;
+}
+
+.stat-card p {
+    font-size: 1.8rem; /* Impactful numbers */
+    font-weight: 600; /* Bold, but not overly so */
+    color: var(--text-color);
+    margin: 0;
+    /* text-shadow: none; Removed glow */
+}
+
+.stat-card p span { /* For units like "GB" */
+    font-size: 0.6em;
+    font-weight: 400;
+    color: var(--text-muted-color);
+    margin-left: 4px;
+}
+
+/* --- Tables --- */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1.5rem;
+    border-radius: var(--border-radius-medium);
+    overflow: hidden; 
+    box-shadow: 0 3px 10px var(--shadow-soft);
+    background-color: var(--surface-color); /* Consistent surface color */
+}
+
+th, td {
+    text-align: left;
+    padding: 0.9rem 1.1rem; /* Adjusted padding */
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+th {
+    background-color: rgba(51, 65, 85, 0.5); /* Slightly different header bg (slate) */
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em; /* Subtle spacing */
+}
+
+thead tr:first-child th:first-child { border-top-left-radius: var(--border-radius-medium); }
+thead tr:first-child th:last-child { border-top-right-radius: var(--border-radius-medium); }
+tbody tr:last-child td:first-child { border-bottom-left-radius: var(--border-radius-medium); }
+tbody tr:last-child td:last-child { border-bottom-right-radius: var(--border-radius-medium); }
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+tbody tr:hover {
+    background-color: rgba(71, 85, 105, 0.5); /* Hover for rows (slate) */
+}
+
+td a.log-link {
+    background-color: var(--accent-color-1);
+    color: #0f172a; /* Dark text on light button for contrast */
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+    border: 1px solid transparent;
+}
+
+td a.log-link:hover {
+    background-color: #67c3f0; /* Lighter shade of accent-1 */
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(56, 189, 248, 0.2);
+}
+
+/* Status Colors in table - using specific classes might be more robust if JS applies them */
+/* For now, keeping JS style application, but CSS could target e.g. td.status-success */
+/* Example: td.status-success { color: var(--success-color); font-weight: bold; } */
+
+
+/* --- Charts --- */
+.chart-container {
+    padding: 1.5rem;
+    border-radius: var(--border-radius-medium);
+    margin-top: 1.5rem;
+    background: var(--surface-color); /* Consistent surface */
+    border: 1px solid var(--border-color);
+    min-height: 280px; /* Adjusted height */
+    transition: box-shadow 0.3s ease;
+}
+.chart-container:hover{
+    box-shadow: 0 5px 15px var(--shadow-soft);
+}
+
+canvas { 
+    max-width: 100%; 
+    height: auto;
+}
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    padding: 1.8rem 1rem;
+    background-color: #0d1321; /* Darker footer base */
+    color: var(--text-muted-color);
+    margin-top: 2.5rem;
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* --- Modal --- */
+.modal {
+    display: none; position: fixed; z-index: 1050; left: 0; top: 0;
+    width: 100%; height: 100%; overflow: auto;
+    background-color: rgba(15, 23, 42, 0.8); /* Semi-transparent overlay */
+    animation: fadeIn 0.25s ease-out;
+}
+
+.modal-content {
+    background: var(--surface-color); /* Opaque surface for modal for readability */
+    /* If keeping subtle glass: background: var(--surface-overlay-color); */
+    /* backdrop-filter: blur(8px); */
+    /* -webkit-backdrop-filter: blur(8px); */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-medium);
+    box-shadow: 0 10px 30px var(--shadow-medium);
+    margin: 7% auto; padding: 1.8rem 2rem; width: 80%; max-width: 850px;
+    position: relative; animation: slideInModal 0.3s ease-out;
+}
+
+.modal-content h2 {
+    margin-top: 0; padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1.4rem; color: var(--text-color); /* Less aggressive color */
+    display: flex; justify-content: space-between; align-items: center;
+}
+.modal-content h2::before { display: none; } /* Remove ::before for modal title */
+
+#logModalFilename {
+    font-weight: 400; font-size: 0.8em; color: var(--text-muted-color);
+}
+
+.close-button {
+    color: var(--text-muted-color); position: absolute; top: 1rem; right: 1.25rem;
+    font-size: 1.6rem; font-weight: bold; line-height: 1;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+.close-button:hover, .close-button:focus {
+    color: var(--text-color); text-decoration: none; cursor: pointer; transform: scale(1.1);
+}
+
+#logModalContent {
+    white-space: pre-wrap; word-wrap: break-word; max-height: 60vh; overflow-y: auto;
+    background-color: #0d1321; /* Darker background for log text */
+    padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);
+    font-family: var(--font-family-mono);
+    font-size: 0.85rem; line-height: 1.6; color: #b0bec5; /* Softer log text color */
+    scrollbar-width: thin; scrollbar-color: var(--accent-color-1) var(--surface-color);
+}
+#logModalContent::-webkit-scrollbar { width: 8px; }
+#logModalContent::-webkit-scrollbar-track { background: var(--surface-color); border-radius: 4px;}
+#logModalContent::-webkit-scrollbar-thumb { background-color: var(--accent-color-1); border-radius: 4px; }
+
+
+/* --- Animations --- */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideInModal {
+    from { transform: translateY(-25px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    body { font-size: 14px; } /* Slightly smaller base font on mobile */
+    header { padding: 1rem; }
+    header h1 { font-size: 1.8rem; }
+    main { padding: 1rem; margin: 1rem auto; }
+    section, .glass-container { padding: 1.5rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.4rem; margin-bottom: 1.2rem; }
+    .grid-container { grid-template-columns: 1fr; gap: 1rem; } /* Single column for cards */
+    .stat-card { padding: 1.2rem; }
+    .stat-card p { font-size: 1.6rem; }
+    table { display: block; overflow-x: auto; /* Allow table horizontal scroll */ } 
+    th, td { padding: 0.7rem 0.9rem; white-space: nowrap; /* Prevent text wrapping in cells */ }
+    .modal-content { width: 95%; padding: 1.2rem; margin: 5% auto; }
+    .modal-content h2 { font-size: 1.2rem; }
+    #logModalContent { font-size: 0.8rem; }
+}
+
+/* --- General Scrollbar for the page --- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--accent-color-1); border-radius: 5px; border: 2px solid var(--bg-color); }
+::-webkit-scrollbar-thumb:hover { background: #67c3f0; /* Lighter accent-1 */ }
