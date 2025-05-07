@@ -24,22 +24,24 @@ The system handles local backup creation (using `rsync` or `tar` for archiving, 
 * **Structured Logging:** Maintains both summary (CSV) and detailed logs for auditing and troubleshooting.
 
 ## Project Structure
+
 BackupVault_Project/
 ├── backupvault.sh              # Main Bash script for local operations
 ├── backup_config_ui.py         # Python Tkinter GUI for configuration
 │
 └── backupvault_web/            # Flask web application for dashboard
-├── app.py                  # Flask backend application logic
-├── data_parser.py          # Python module for parsing config and logs
-├── static/
-│   ├── css/
-│   │   └── style.css       # CSS for the dashboard
-│   └── js/
-│       ├── main.js         # JavaScript for dashboard interactivity
-│       └── (Chart.min.js)  # Chart.js library (typically loaded via CDN in HTML)
-├── templates/
-│   └── dashboard.html      # HTML template for the dashboard
-└── instance/               # (May be created by Flask for instance-specific data)
+    ├── app.py                  # Flask backend application logic
+    ├── data_parser.py          # Python module for parsing config and logs
+    ├── static/
+    │   ├── css/
+    │   │   └── style.css       # CSS for the dashboard
+    │   └── js/
+    │       ├── main.js         # JavaScript for dashboard interactivity
+    │       └── Chart.min.js    # Chart.js library (typically loaded via CDN)
+    ├── templates/
+    │   └── dashboard.html      # HTML template for the dashboard
+    └── instance/               # (May be created by Flask for instance-specific data)
+    
 
 ## File Descriptions
 
